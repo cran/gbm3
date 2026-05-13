@@ -11,7 +11,24 @@
 //-----------------------------------
 
 #include "bernoulli.h"
+#include <cmath>
 #include <memory>
+
+namespace {
+double softplus(double x) {
+  return x > 0.0 ? x + std::log1p(std::exp(-x)) : std::log1p(std::exp(x));
+}
+
+double sigmoid(double x) {
+  if (x >= 0.0) {
+    const double exp_neg = std::exp(-x);
+    return 1.0 / (1.0 + exp_neg);
+  }
+
+  const double exp_x = std::exp(x);
+  return exp_x / (1.0 + exp_x);
+}
+}
 
 //----------------------------------------
 // Function Members - Private
@@ -56,10 +73,13 @@ double CBernoulli::InitF(const CDataset& kData) {
     double denominator = 0.0;
 
     for (unsigned long i = 0; i < kData.get_trainsize(); i++) {
-      const double dTemp =
-          1.0 / (1.0 + std::exp(-(kData.offset_ptr()[i] + initfunc_est)));
+      const double dTemp = sigmoid(kData.offset_ptr()[i] + initfunc_est);
       numerator += kData.weight_ptr()[i] * (kData.y_ptr()[i] - dTemp);
       denominator += kData.weight_ptr()[i] * dTemp * (1.0 - dTemp);
+    }
+
+    if (denominator == 0.0) {
+      break;
     }
 
     newtonstep = numerator / denominator;
@@ -82,7 +102,7 @@ double CBernoulli::Deviance(const CDataset& kData, const Bag& kBag,
   for (unsigned long i = 0; i < num_of_rows_in_set; i++) {
     const double deltafunc_est = kFuncEstimate[i] + kData.offset_ptr()[i];
     loss += kData.weight_ptr()[i] * (kData.y_ptr()[i] * deltafunc_est -
-                                     std::log(1.0 + std::exp(deltafunc_est)));
+                                     softplus(deltafunc_est));
     weight += kData.weight_ptr()[i];
   }
 
@@ -164,9 +184,9 @@ double CBernoulli::BagImprovement(const CDataset& kData, const Bag& kBag,
         returnvalue += kData.weight_ptr()[i] * kShrinkage * kDeltaEstimate[i];
       }
       returnvalue += kData.weight_ptr()[i] *
-                     (std::log(1.0 + std::exp(deltafunc_est)) -
-                      std::log(1.0 + std::exp(deltafunc_est +
-                                              kShrinkage * kDeltaEstimate[i])));
+                     (softplus(deltafunc_est) -
+                      softplus(deltafunc_est +
+                               kShrinkage * kDeltaEstimate[i]));
       weight += kData.weight_ptr()[i];
     }
   }

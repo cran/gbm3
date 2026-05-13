@@ -101,12 +101,15 @@ check_offset <- function(o, y, dist){
    # Check offset
   if(is.null(o))
       o <- rep(0,length(y))
-   else if((length(o) != length(y)) && (distribution_name(dist) != "CoxPH"))
+   else if(length(o) != length(y))
       stop("The length of offset does not equal the length of y.")
    else if(!is.numeric(o))
      stop("offset must be numeric")
    else if(sum(is.na(o))>0)
      stop("offset can not contain NA's")
+   else if(distribution_name(dist) %in% c("Poisson", "Gamma", "Tweedie") &&
+           any(abs(o) > 650))
+     stop("offsets for Poisson, Gamma, and Tweedie must be between -650 and 650 on the link scale")
 
    o
 }

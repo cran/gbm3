@@ -12,7 +12,7 @@
 
 <meta name="author" content="James Hickey" />
 
-<meta name="date" content="2024-01-21" />
+<meta name="date" content="2026-05-09" />
 
 <title>Model Specific Parameters</title>
 
@@ -50,6 +50,7 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -340,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Model Specific Parameters</h1>
 <h4 class="author">James Hickey</h4>
-<h4 class="date">2024-01-21</h4>
+<h4 class="date">2026-05-09</h4>
 
 
 
@@ -485,17 +486,25 @@ expectation via: <span class="math inline">\(Var(Y) = E[Y]^p\)</span>,
 where <code>p</code> is the power of the distribution. This parameter is
 specified through the <code>power</code> named argument on calling
 <code>gbm_dist</code> and its default value is 1.5.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Create a TweedieGBMDist object with a power of 2 - equivalent to a Gamma distribution</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tweedie_dist <span class="ot">&lt;-</span> <span class="fu">gbm_dist</span>(<span class="at">name=</span><span class="st">&quot;Tweedie&quot;</span>, <span class="at">power=</span><span class="dv">2</span>)</span></code></pre></div>
-<p>Tweedie distributions include various more familiar distributions
-which can be accessed through setting the <code>power</code>
-parameter:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Create a TweedieGBMDist object with a compound Poisson-Gamma power</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tweedie_dist <span class="ot">&lt;-</span> <span class="fu">gbm_dist</span>(<span class="at">name=</span><span class="st">&quot;Tweedie&quot;</span>, <span class="at">power=</span><span class="fl">1.5</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Use the Gamma distribution for the Tweedie p = 2 endpoint</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>gamma_dist <span class="ot">&lt;-</span> <span class="fu">gbm_dist</span>(<span class="at">name=</span><span class="st">&quot;Gamma&quot;</span>)</span></code></pre></div>
+<p>Tweedie distributions include various more familiar limiting cases,
+but this implementation handles the <code>power=0</code>,
+<code>power=1</code>, and <code>power=2</code> endpoints through their
+dedicated distribution choices rather than through
+<code>gbm_dist(name=&quot;Tweedie&quot;, ...)</code>:</p>
 <ul>
-<li>normal distribution: <code>power=0</code>.</li>
-<li>Poisson distribution: <code>power=1</code>.</li>
+<li>normal distribution: use <code>gbm_dist(name=&quot;Gaussian&quot;)</code>
+instead of <code>power=0</code>.</li>
+<li>Poisson distribution: use <code>gbm_dist(name=&quot;Poisson&quot;)</code>
+instead of <code>power=1</code>.</li>
 <li>compound Poisson-Gamma distributions:
 <code>1 &lt; power &lt; 2</code>.</li>
-<li>Gamma distribution: <code>power=2</code>.</li>
+<li>Gamma distribution: use <code>gbm_dist(name=&quot;Gamma&quot;)</code> instead
+of <code>power=2</code>.</li>
 <li>positive stable distributions: <code>2 &lt; power &lt; 3</code> and
 <code>power &gt; 3</code>.</li>
 <li>inverse Gaussian distribution: <code>power=3</code>.</li>

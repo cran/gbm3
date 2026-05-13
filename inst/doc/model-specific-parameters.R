@@ -54,6 +54,9 @@ quant_dist <- gbm_dist(name="Quantile", alpha=0.1)
 t_dist <- gbm_dist(name="TDist", df=7)
 
 ## -----------------------------------------------------------------------------
-# Create a TweedieGBMDist object with a power of 2 - equivalent to a Gamma distribution
-tweedie_dist <- gbm_dist(name="Tweedie", power=2)
+# Create a TweedieGBMDist object with a compound Poisson-Gamma power
+tweedie_dist <- gbm_dist(name="Tweedie", power=1.5)
+
+# Use the Gamma distribution for the Tweedie p = 2 endpoint
+gamma_dist <- gbm_dist(name="Gamma")
 

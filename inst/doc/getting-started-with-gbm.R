@@ -36,7 +36,7 @@ train_params <- training_params(num_trees = 2000, interaction_depth = 3,
 
 ## -----------------------------------------------------------------------------
 # Example of a gbmParallel with more threads
-par_detail <- gbmParallel(num_threads = 10) # Pass to par_details in gbmt
+par_detail <- gbmParallel(num_threads = 2) # Pass to par_details in gbmt
 
 ## ----message=FALSE------------------------------------------------------------
 # Create a gbm fit

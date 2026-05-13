@@ -1,29 +1,34 @@
-gbm3: generalized boosted models
-----0------------------------
+# gbm3: Generalized Boosted Models
 
-<!-- [![Build Status](https://travis-ci.org/gbm-developers/gbm.svg?branch=master)](https://travis-ci.org/gbm-developers/gbm3) -->
-<!--  [![Coverage Status](https://coveralls.io/repos/gbm-developers/gbm/badge.svg?branch=master&service=github)](https://coveralls.io/github/gbm-developers/gbm3?branch=master) -->
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/gbm-developers/gbm3/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gbm-developers/gbm3/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
 
 Originally written by Greg Ridgeway between 1999-2003, added to by various 
 authors, extensively updated and polished by James Hickey in 2016, survival 
 models greatly improved by Terry Therneau in 2016, and currently 
 maintained by Greg Ridgeway.
-Development is discussed --- somewhat --- at
-https://groups.google.com/forum/#!forum/gbm-dev .
+Development is discussed at the
+[gbm-dev Google Group](https://groups.google.com/forum/#!forum/gbm-dev).
 
-This is the shiny new gbm3 package that is not backwards compatible with R code
-calling the original gbm package, but is fast and parallel and developed.
+`gbm3` provides generalized boosted regression models with a newer API than the
+original `gbm` package. The package supports regression, classification,
+survival models, and learning-to-rank methods, with optional OpenMP
+parallelization in the core fitting code.
 
-Non-production releases (bug fixes, mostly) will be released via the GitHub
-release workflow. To install from GitHub, first install `devtools` from CRAN:
-
-```R
-install.packages("devtools")
-```
-
-Then install `gbm3` from GitHub:
+To install the development version from GitHub, first install `remotes`:
 
 ```R
-library("devtools")
-install_github("gbm-developers/gbm3")
+install.packages("remotes")
 ```
+
+Then install `gbm3`:
+
+```R
+remotes::install_github("gbm-developers/gbm3")
+
+# or to build vignettes during installation
+remotes::install_github("gbm-developers/gbm3", build_vignettes = TRUE, force = TRUE)
+```
+
+

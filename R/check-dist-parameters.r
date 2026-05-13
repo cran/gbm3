@@ -21,6 +21,7 @@ check_dist_params <- function(empty_obj, ...) {
   UseMethod("check_dist_params", empty_obj)
 }
 
+#' @export
 check_dist_params.AdaBoostGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional
@@ -28,6 +29,7 @@ check_dist_params.AdaBoostGBMDist <- function(empty_obj, ...) {
   }
 }
 
+#' @export
 check_dist_params.BernoulliGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional
@@ -35,6 +37,7 @@ check_dist_params.BernoulliGBMDist <- function(empty_obj, ...) {
   }
 }
 
+#' @export
 check_dist_params.CoxPHGBMDist <- function(empty_obj, strata, sorted, ties, prior_node_coeff, ...) {
   # Check if additional parameters specified
   if((length(list(...)) > 0)) {
@@ -78,17 +81,19 @@ check_dist_params.CoxPHGBMDist <- function(empty_obj, strata, sorted, ties, prio
   if(!exists("prior_node_coeff")) {
     stop("Prior node coefficient of variation not specified - distribution could not be constructed")
   } else if(!is.double(prior_node_coeff) || is.infinite(prior_node_coeff) ||
-            (length(prior_node_coeff) > 1)) {
-    stop("Prior node coefficient not a finite double - distribution could not be constructed")
+            (length(prior_node_coeff) > 1) || prior_node_coeff <= 0.0) {
+    stop("Prior node coefficient must be a positive finite double - distribution could not be constructed")
   } 
 }
 
+#' @export
 check_dist_params.GammaGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional parameters in construction.")
   }
 }
 
+#' @export
 check_dist_params.GaussianGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], " class does not use any additional
@@ -96,6 +101,7 @@ check_dist_params.GaussianGBMDist <- function(empty_obj, ...) {
   }
 }
 
+#' @export
 check_dist_params.HuberizedGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional
@@ -103,6 +109,7 @@ check_dist_params.HuberizedGBMDist <- function(empty_obj, ...) {
   }
 }
 
+#' @export
 check_dist_params.LaplaceGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional
@@ -112,6 +119,7 @@ check_dist_params.LaplaceGBMDist <- function(empty_obj, ...) {
 
 
 
+#' @export
 check_dist_params.PairwiseGBMDist <- function(empty_obj, group, metric,
                                               max_rank, group_index, ...) {
   # Check if parameters are specified
@@ -155,6 +163,7 @@ check_dist_params.PairwiseGBMDist <- function(empty_obj, group, metric,
   }
 }
 
+#' @export
 check_dist_params.PoissonGBMDist <- function(empty_obj, ...) {
   if(length(list(...)) > 0) {
     warning("The ", class(empty_obj)[1], "class does not use any additional
@@ -162,6 +171,7 @@ check_dist_params.PoissonGBMDist <- function(empty_obj, ...) {
   }
 }
 
+#' @export
 check_dist_params.QuantileGBMDist <- function(empty_obj, alpha, ...) {
   # Check if parameters are specified
   if(length(list(...)) > 0) {
@@ -178,6 +188,7 @@ check_dist_params.QuantileGBMDist <- function(empty_obj, alpha, ...) {
   }
 }
 
+#' @export
 check_dist_params.TDistGBMDist <- function(empty_obj, df, ...) {
   # Check if parameters are specified
   if(length(list(...)) > 0) {
@@ -195,6 +206,7 @@ check_dist_params.TDistGBMDist <- function(empty_obj, df, ...) {
   
 }
 
+#' @export
 check_dist_params.TweedieGBMDist <- function(empty_obj, power, ...) {
   # Check if parameters are specified
   if(length(list(...)) > 0) {
@@ -205,9 +217,17 @@ check_dist_params.TweedieGBMDist <- function(empty_obj, power, ...) {
   if(!exists("power")) {
     stop("Power of distribution (power) is not specified - distribution cannot be specified")
   } else if (!(is.double(power)) || (length(power) > 1)
-             || is.infinite((power)) || power < 0.0) {
+             || is.infinite((power)) || is.na(power)) {
     stop("Power provided is not a finite double  - distribution 
          cannot be constructed")
+  } else if (power == 0.0) {
+    stop("Tweedie power cannot be 0 in this implementation. Use the Gaussian distribution instead.")
+  } else if (power == 1.0) {
+    stop("Tweedie power cannot be 1 in this implementation. Use the Poisson distribution instead.")
+  } else if (power == 2.0) {
+    stop("Tweedie power cannot be 2 in this implementation. Use the Gamma distribution instead.")
+  } else if (power > 0.0 && power < 1.0) {
+    stop("Tweedie power must not be between 0 and 1.")
   }
 }
 
