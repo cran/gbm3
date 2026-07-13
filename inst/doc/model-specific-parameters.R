@@ -50,7 +50,7 @@ pair_dist <- gbm_dist(name="Pairwise", group="query", max_rank=1, metric="ndcg")
 quant_dist <- gbm_dist(name="Quantile", alpha=0.1)
 
 ## -----------------------------------------------------------------------------
-# Creat a t-distribution object with 7 degrees of freedom
+# Create a t-distribution object with 7 degrees of freedom
 t_dist <- gbm_dist(name="TDist", df=7)
 
 ## -----------------------------------------------------------------------------

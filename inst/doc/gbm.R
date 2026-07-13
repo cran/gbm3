@@ -65,7 +65,7 @@ set.seed(557165559)
 
 knitr::include_graphics("shrinkViters.png")
 
-## ----oobperf2, echo = FALSE, message=FALSE, fig.align='center', fig.cap='**Figure 2**. Out-of-sample predictive performance of four methods of selecting the optimal number of iterations. The vertical axis plots performance relative the best. The boxplots indicate relative performance across thirteen real datasets from the UCI repository. See `demo(OOB-reps)`.', out.width="80%"----
+## ----oobperf2, echo = FALSE, message=FALSE, fig.align='center', fig.cap='**Figure 2**. Out-of-sample predictive performance of four methods of selecting the optimal number of iterations. The vertical axis plots performance relative to the best. The boxplots indicate relative performance across thirteen real datasets from the UCI repository. See `demo(OOB-reps)`.', out.width="80%"----
 
 knitr::include_graphics("oobperf2.png")
 

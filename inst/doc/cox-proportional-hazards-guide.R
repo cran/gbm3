@@ -2,7 +2,7 @@
 library("gbm3")
 
 ## ----message=FALSE------------------------------------------------------------
-## Install package
+## Load package
 require(survival)
 
 # get datasets
@@ -13,7 +13,7 @@ start_stop <- cgd
 right_cens_dist <- gbm_dist("CoxPH", strata=right_cens$hos.cat)
 start_stop_dist <- gbm_dist("CoxPH", strata=start_stop$hos.cat)
 
-## ----messagee=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 # Set-up training parameters
 params_right_cens <- training_params(num_trees = 2000, interaction_depth = 3, 
                                      id=right_cens$id,

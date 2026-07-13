@@ -12,7 +12,7 @@
 
 <meta name="author" content="James Hickey" />
 
-<meta name="date" content="2026-05-09" />
+<meta name="date" content="2026-07-13" />
 
 <title>Guide to the Cox Proportional Hazards model</title>
 
@@ -342,28 +342,26 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Guide to the Cox Proportional Hazards
 model</h1>
 <h4 class="author">James Hickey</h4>
-<h4 class="date">2026-05-09</h4>
+<h4 class="date">2026-07-13</h4>
 
 
 
-<p><code>gbm</code> facilitates the creation of boosted Cox proportional
-hazards models, a particularly useful feature when dealing with survival
-data. The package can handle two types of survival object as the
-response, namely a right censored or counting survival object. Both of
-these objects can be created using the <code>Surv</code> command found
-in the <code>survival</code> package.</p>
-<div id="set-up-of-data-and-distribution-object" class="section level1">
-<h1>Set-up of data and distribution object</h1>
-<p>Right censored survival data consists of a time to event number and
-the event indicator - 0 if no event has taken place and 1 if the event
-has happened. On the other hand, counting survival data contains start
-and stop times along with an event indicator again indicating if an
-event has taken place in that period. The data may be organised into
-strata and this should be passed to <code>gbm_dist</code> on creation of
-the <code>CoxPHGBMDist</code> object - see the “Model Specific
-Parameters” vignette for more details. The dataset considered here is
-provided by the <code>survival</code> package.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="do">## Install package</span></span>
+<p><code>gbm</code> supports boosted Cox proportional hazards models for
+survival data. The package can handle two types of survival response:
+right-censored and counting-process <code>Surv</code> objects. Both can
+be created with the <code>Surv</code> function from the
+<code>survival</code> package.</p>
+<div id="setting-up-data-and-the-distribution-object" class="section level1">
+<h1>Setting up data and the distribution object</h1>
+<p>Right-censored survival data consist of a time-to-event value and an
+event indicator: 0 if no event has occurred and 1 if the event has
+occurred. Counting-process survival data contain start and stop times
+along with an event indicator for the interval. Data may be organized
+into strata, which should be passed to <code>gbm_dist</code> when
+creating the <code>CoxPHGBMDist</code> object; see the “Model Specific
+Parameters” vignette for more details. The dataset used here is provided
+by the <code>survival</code> package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="do">## Load package</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">require</span>(survival)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># get datasets</span></span>
@@ -376,11 +374,10 @@ provided by the <code>survival</code> package.</p>
 </div>
 <div id="creating-a-boosted-model" class="section level1">
 <h1>Creating a boosted model</h1>
-<p>Now to create the underlying boosted model the training parameters
-need to be defined and <code>gbmt</code> called. In this instance the
-data has observation ids associated with it and so it is necessary to
-create specific <code>GBMTrainParams</code> objects rather than relying
-on the defaults.</p>
+<p>To create the boosted model, define the training parameters and call
+<code>gbmt</code>. In this example, the data have observation IDs, so it
+is necessary to create specific <code>GBMTrainParams</code> objects
+rather than relying on the defaults.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Set-up training parameters</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>params_right_cens <span class="ot">&lt;-</span> <span class="fu">training_params</span>(<span class="at">num_trees =</span> <span class="dv">2000</span>, <span class="at">interaction_depth =</span> <span class="dv">3</span>, </span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                                     <span class="at">id=</span>right_cens<span class="sc">$</span>id,</span>
@@ -407,15 +404,14 @@ on the defaults.</p>
 </div>
 <div id="strata-updates" class="section level1">
 <h1>Strata Updates</h1>
-<p>During the fitting process the original strata vector is updated in
-the following way. When the data is split into a training and validation
-set the strata vector is also split. The strata vector is then updated
-so as represent the cumulative count of the number of observations in
-each stratum in the training and validation sets. The vector is padded
-with <code>NAs</code> so it is of the same length as the original strata
-vector provided and such that the validation set cumulative strata sums
-are separated from the training set strata counts by the appropriate
-amount.</p>
+<p>During fitting, the original strata vector is updated as follows.
+When the data are split into training and validation sets, the strata
+vector is also split. The strata vector is then updated to represent the
+cumulative count of observations in each stratum for the training and
+validation sets. The vector is padded with <code>NA</code>s so it has
+the same length as the original strata vector and so that the
+validation-set cumulative strata sums are separated from the
+training-set strata counts by the appropriate amount.</p>
 <p>The original strata vector is stored within the <code>GBMFit</code>
 object and can be accessed as follows:
 <code>fit$distribution$original_strata_id</code>. The data in the
@@ -501,12 +497,12 @@ underlying algorithm is described in the next section.</p>
 <div id="description-of-the-underlying-algorithm---specifically-for-coxph" class="section level1">
 <h1>Description of the underlying algorithm - specifically for
 CoxPH</h1>
-<p>The <code>gbm</code> algorithm works to estimate, via tree boosting,
-the function <span class="math inline">\(f(\textbf{x})\)</span>, which
-maps covariates (<span class="math inline">\(\textbf{x}\)</span>) to the
-response variable <em>y</em> - in this case the event indicator. For
-<code>CoxPH</code>, the algorithm calculates both the partial log
-likelihood and martingale residuals (<span class="math inline">\(\textbf{m}\)</span>) using the following approach.
+<p>The <code>gbm</code> algorithm estimates, via tree boosting, the
+additive predictor <span class="math inline">\(f(\textbf{x})\)</span>.
+For <code>CoxPH</code>, this predictor is the log relative risk used in
+the Cox partial likelihood, rather than a direct prediction of the event
+indicator. For <code>CoxPH</code>, the algorithm calculates both the
+partial log likelihood and martingale residuals (<span class="math inline">\(\textbf{m}\)</span>) using the following approach.
 The algorithm walks backwards in time until it encounters the “stop”
 time of an observation. When this happens the weighted risk associated
 with that observation, <span class="math inline">\(\omega_i
@@ -554,9 +550,8 @@ on construction of the <code>CoxPHGBMDist</code> through the
 prediction is given by: <span class="math display">\[ \log(\frac{\sum_i
 y_i + 1/c}{\sum_i \max(0.0, y_i - \textbf{m}_i) + 1/c}). \qquad
 (5)\]</span></p>
-<p>If this <code>prior_node_coeff_var</code> is set incorrectly, i. e.
-to not a finite positive double, then the predictions of the fitted
-model can become non-sensical.</p>
+<p>If <code>prior_node_coeff_var</code> is not set to a finite positive
+double, the fitted model’s predictions can become nonsensical.</p>
 </div>
 
 
